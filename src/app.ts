@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { authRouter } from "./modules/auth/auth.routes";
+import { courtsRouter } from "./modules/courts/courts.routes";
 import { errorHandler } from "./middleware/error";
 
 export const app = express();
@@ -24,6 +25,10 @@ app.get("/", (_req, res) => {
         logout: "POST /api/auth/logout",
         me: "GET /api/auth/me",
       },
+      courts: {
+        list: "GET /api/courts",
+        getById: "GET /api/courts/:id",
+      },
     },
     docs: "See TESTING.md and QUICK_START.md for usage examples",
   });
@@ -35,6 +40,9 @@ app.get("/health", (_req, res) => {
 
 // Mount auth routes
 app.use("/api/auth", authRouter);
+
+// Mount courts routes
+app.use("/api/courts", courtsRouter);
 
 // Error handler must be last
 app.use(errorHandler);
