@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
 import { db } from "../../db";
+import { AppError } from "../../middleware/error";
 import type { DeviceInfo, RefreshTokenRow } from "./auth.types";
 
 export class TokenService {
@@ -65,7 +66,7 @@ export class TokenService {
       }
     }
 
-    throw new Error("Invalid or expired refresh token");
+    throw new AppError("Invalid or expired refresh token", 401);
   }
 
   /**

@@ -2,6 +2,7 @@ import { OAuth2Client } from "google-auth-library";
 import appleSignin from "apple-signin-auth";
 import { db } from "../../db";
 import { env } from "../../config/env";
+import { AppError } from "../../middleware/error";
 import { JWTService } from "./jwt.service";
 import { TokenService } from "./token.service";
 import type {
@@ -52,13 +53,13 @@ export class AuthService {
 
     const payload = ticket.getPayload() as GoogleTokenPayload;
     if (!payload) {
-      throw new Error("Invalid Google token");
+      throw new AppError("Invalid Google token", 401);
     }
 
     const { sub: googleId, email, email_verified, name, picture } = payload;
 
     if (!email) {
-      throw new Error("Email not provided by Google");
+      throw new AppError("Email not provided by Google", 401);
     }
 
     // Find or create user
@@ -112,13 +113,13 @@ export class AuthService {
     })) as AppleTokenPayload;
 
     if (!payload) {
-      throw new Error("Invalid Apple token");
+      throw new AppError("Invalid Apple token", 401);
     }
 
     const { sub: appleId, email, email_verified } = payload;
 
     if (!email) {
-      throw new Error("Email not provided by Apple");
+      throw new AppError("Email not provided by Apple", 401);
     }
 
     // Find or create user
@@ -169,7 +170,7 @@ export class AuthService {
     if (reuseUserId) {
       // Token reuse detected - revoke all user's tokens
       await TokenService.revokeAllUserTokens(reuseUserId);
-      throw new Error("Token reuse detected - all tokens revoked");
+      throw new AppError("Token reuse detected - all tokens revoked", 401);
     }
 
     // Validate refresh token
@@ -182,7 +183,7 @@ export class AuthService {
     );
 
     if (result.rows.length === 0) {
-      throw new Error("User not found");
+      throw new AppError("User not found", 404);
     }
 
     const user = this.rowToUser(result.rows[0]);
@@ -224,7 +225,7 @@ export class AuthService {
     );
 
     if (result.rows.length === 0) {
-      throw new Error("User not found");
+      throw new AppError("User not found", 404);
     }
 
     return this.rowToUser(result.rows[0]);
