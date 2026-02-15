@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16
+    container_name: courtpulse_db
+    environment:
+      POSTGRES_USER: courtpulse
+      POSTGRES_PASSWORD: courtpulse
+      POSTGRES_DB: courtpulse
+    ports:
+      - "5432:5432"
+    volumes:
+      - courtpulse_data:/var/lib/postgresql/data
+
+volumes:
+  courtpulse_data:
