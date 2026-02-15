@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
-import { pool } from "./config/db";
+import { authRouter } from "./modules/auth/auth.routes";
+import { errorHandler } from "./middleware/error";
 
 export const app = express();
 
@@ -11,8 +12,8 @@ app.get("/health", (_req, res) => {
   res.json({ ok: true });
 });
 
+// Mount auth routes
+app.use("/api/auth", authRouter);
 
-app.get("/db-test", async (_req, res) => {
-  const result = await pool.query("SELECT NOW() as now");
-  res.json({ now: result.rows[0].now });
-});
+// Error handler must be last
+app.use(errorHandler);
