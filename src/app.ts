@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { authRouter } from "./modules/auth/auth.routes";
 import { courtsRouter } from "./modules/courts/courts.routes";
+import { checkinsRouter } from "./modules/checkins/checkins.routes";
 import { errorHandler } from "./middleware/error";
 
 export const app = express();
@@ -28,6 +29,14 @@ app.get("/", (_req, res) => {
       courts: {
         list: "GET /api/courts",
         getById: "GET /api/courts/:id",
+        occupancy: "GET /api/courts/occupancy",
+        courtOccupancy: "GET /api/courts/:id/occupancy",
+      },
+      checkins: {
+        create: "POST /api/checkins",
+        checkout: "POST /api/checkins/:id/checkout",
+        active: "GET /api/checkins/active",
+        history: "GET /api/checkins",
       },
     },
     docs: "See TESTING.md and QUICK_START.md for usage examples",
@@ -43,6 +52,9 @@ app.use("/api/auth", authRouter);
 
 // Mount courts routes
 app.use("/api/courts", courtsRouter);
+
+// Mount checkins routes
+app.use("/api/checkins", checkinsRouter);
 
 // Error handler must be last
 app.use(errorHandler);

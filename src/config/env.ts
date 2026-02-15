@@ -14,6 +14,11 @@ export const env = {
   JWT_EXPIRES_IN: "15m" as const,
   REFRESH_TOKEN_EXPIRES_IN: "30d" as const,
 
+  // Check-ins
+  CHECKIN_EXPIRY_MINUTES: process.env.CHECKIN_EXPIRY_MINUTES
+    ? Number(process.env.CHECKIN_EXPIRY_MINUTES)
+    : 90,
+
   NODE_ENV: process.env.NODE_ENV || "development",
 };
 
@@ -25,6 +30,8 @@ if (!env.JWT_SECRET) {
   throw new Error("Missing JWT_SECRET in .env");
 }
 
-if (!env.GOOGLE_CLIENT_ID && !env.APPLE_CLIENT_ID) {
-  throw new Error("At least one OAuth provider (GOOGLE_CLIENT_ID or APPLE_CLIENT_ID) must be configured");
+// In production, require at least one OAuth provider
+// In development, allow missing OAuth for testing with dev/login endpoint
+if (env.NODE_ENV === "production" && !env.GOOGLE_CLIENT_ID && !env.APPLE_CLIENT_ID) {
+  throw new Error("At least one OAuth provider (GOOGLE_CLIENT_ID or APPLE_CLIENT_ID) must be configured in production");
 }
