@@ -4,6 +4,7 @@ import { authRouter } from "./modules/auth/auth.routes";
 import { courtsRouter } from "./modules/courts/courts.routes";
 import { checkinsRouter } from "./modules/checkins/checkins.routes";
 import { errorHandler } from "./middleware/error";
+import { pool } from "./config/db";
 
 export const app = express();
 
@@ -43,8 +44,33 @@ app.get("/", (_req, res) => {
   });
 });
 
-app.get("/health", (_req, res) => {
-  res.json({ ok: true });
+app.get("/health", async (_req, res) => {
+  const health: any = {
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || "development",
+  };
+
+  // Check database connection
+  try {
+    const result = await pool.query("SELECT NOW() as time, version() as version");
+    health.database = {
+      status: "connected",
+      serverTime: result.rows[0].time,
+      version: result.rows[0].version.split(" ")[0] + " " + result.rows[0].version.split(" ")[1],
+    };
+  } catch (error) {
+    health.status = "degraded";
+    health.database = {
+      status: "disconnected",
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+
+  // Return appropriate status code
+  const statusCode = health.status === "ok" ? 200 : 503;
+  res.status(statusCode).json(health);
 });
 
 // Mount auth routes

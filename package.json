@@ -7,8 +7,11 @@
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
+    "setup": "bash scripts/setup.sh",
     "test:auth": "bash scripts/test-auth.sh",
     "db:inspect": "bash scripts/db-inspect.sh",
+    "db:seed": "bash scripts/seed-db.sh",
+    "db:reset": "bash scripts/reset-db.sh",
     "troubleshoot": "bash scripts/troubleshoot.sh",
     "fix-port": "lsof -ti :3000 | xargs kill -9 || echo 'Port already free'"
   },
